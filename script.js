@@ -1,59 +1,48 @@
 /* ============================================================
    WEDDING INVITATION — script.js
-   Aryan & Sekar | Premium Digital Wedding Card
    ============================================================ */
 
 /* ============================================================
    1. URL PARAMETER — Guest Name Personalisation
+   Format URL: https://ruhillah-ramadhan.vercel.app/Bapak-Budi
    ============================================================ */
 function getGuestNameFromPath() {
   try {
     const url = new URL(window.location.href);
-    let path = url.pathname; // contoh: "/Bapak-Budi"
-    // Hilangkan trailing slash
+    let path = url.pathname;
     if (path.endsWith("/")) path = path.slice(0, -1);
-    // Ambil segmen terakhir
     const segments = path.split("/").filter(Boolean);
     const last = segments.pop() || "";
     if (!last) return "";
-
-    // Decode dari URL (Bapak-Budi%20Sutanto → Bapak-Budi Sutanto)
     let decoded = decodeURIComponent(last);
-
-    // Opsional: ubah tanda "-" jadi spasi, biar lebih manusiawi
     decoded = decoded.replace(/-/g, " ");
-
     return decoded;
   } catch (e) {
     return "";
   }
 }
 
-// Set nama tamu di cover & main
-const guestName = getGuestNameFromPath();
-const guestNameCoverEl = document.getElementById("guest-name-cover");
-const guestNameMainEl = document.getElementById("guest-name-main");
-const guestLineEl = document.getElementById("guest-line");
+const guestName      = getGuestNameFromPath();
+const guestNameEl    = document.getElementById("guestName");
+const guestLabelEl   = document.getElementById("guestLabel");
 
-if (guestName && guestNameCoverEl && guestNameMainEl) {
-  guestNameCoverEl.textContent = guestName;
-  guestNameMainEl.textContent = guestName;
-} else if (guestLineEl) {
-  // Kalau tidak ada nama di URL, bisa tetap ditampilkan "Tamu Undangan"
-  guestLineEl.classList.add("hidden");
+if (guestName && guestNameEl) {
+  guestNameEl.textContent = guestName;
+} else if (guestNameEl) {
+  guestNameEl.textContent = "Tamu Undangan";
 }
 
 /* ============================================================
-   2. FALLING PETALS (purely decorative)
+   2. FALLING PETALS
    ============================================================ */
 (function createPetals() {
   const container = document.getElementById('petals');
-  const count     = window.innerWidth < 600 ? 12 : 22;
+  if (!container) return;
+  const count = window.innerWidth < 600 ? 12 : 22;
 
   for (let i = 0; i < count; i++) {
-    const p = document.createElement('div');
-    p.className = 'petal';
-
+    const p        = document.createElement('div');
+    p.className    = 'petal';
     const size     = 8 + Math.random() * 10;
     const left     = Math.random() * 100;
     const duration = 6 + Math.random() * 10;
@@ -75,57 +64,52 @@ if (guestName && guestNameCoverEl && guestNameMainEl) {
 })();
 
 /* ============================================================
-   3. COVER PARALLAX on mouse / device tilt
+   3. COVER PARALLAX
    ============================================================ */
 const coverBg = document.getElementById('coverBg');
 
-// Kick off subtle zoom animation
-setTimeout(() => coverBg.classList.add('zoomed'), 100);
+if (coverBg) {
+  setTimeout(() => coverBg.classList.add('zoomed'), 100);
 
-// Mouse parallax (desktop)
-document.addEventListener('mousemove', (e) => {
-  const xPct = (e.clientX / window.innerWidth  - 0.5) * 8;  // ±4 %
-  const yPct = (e.clientY / window.innerHeight - 0.5) * 8;
-  coverBg.style.transform = `translate(${xPct}px, ${yPct}px) scale(1.08)`;
-});
-
-// Device tilt parallax (mobile)
-if (window.DeviceOrientationEvent) {
-  window.addEventListener('deviceorientation', (e) => {
-    const x = Math.min(Math.max(e.gamma || 0, -20), 20) * 0.2;
-    const y = Math.min(Math.max(e.beta  || 0, -20), 20) * 0.2;
-    coverBg.style.transform = `translate(${x}px, ${y}px) scale(1.08)`;
+  document.addEventListener('mousemove', (e) => {
+    const xPct = (e.clientX / window.innerWidth  - 0.5) * 8;
+    const yPct = (e.clientY / window.innerHeight - 0.5) * 8;
+    coverBg.style.transform = `translate(${xPct}px, ${yPct}px) scale(1.08)`;
   });
+
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', (e) => {
+      const x = Math.min(Math.max(e.gamma || 0, -20), 20) * 0.2;
+      const y = Math.min(Math.max(e.beta  || 0, -20), 20) * 0.2;
+      coverBg.style.transform = `translate(${x}px, ${y}px) scale(1.08)`;
+    });
+  }
 }
 
 /* ============================================================
-   4. OPEN INVITATION BUTTON — show main, start music
+   4. OPEN INVITATION BUTTON
    ============================================================ */
-const cover    = document.getElementById('cover');
-const main     = document.getElementById('main');
-const openBtn  = document.getElementById('openBtn');
-const audio    = document.getElementById('audio');
+const cover   = document.getElementById('cover');
+const main    = document.getElementById('main');
+const openBtn = document.getElementById('openBtn');
+const audio   = document.getElementById('audio');
 
 openBtn.addEventListener('click', () => {
-  // 1. Animate cover out
   cover.classList.add('hide');
 
-  // 2. After transition, remove from flow (still accessible for screen readers)
   setTimeout(() => {
     cover.style.display = 'none';
   }, 950);
 
-  // 3. Show main content
   main.classList.remove('hidden');
-  // Force reflow before transition
   void main.offsetHeight;
   main.style.opacity = '1';
 
-  // 4. Play music
   attemptPlay();
-
-  // 5. Scroll to top of main
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Tunggu animasi cover selesai (950ms) baru init observer
+  setTimeout(initObserver, 1000);
 });
 
 /* ============================================================
@@ -139,53 +123,56 @@ const musicWave = document.querySelector('.music-wave');
 let isPlaying = false;
 
 function attemptPlay() {
+  if (!audio) return;
   const promise = audio.play();
   if (promise !== undefined) {
     promise
-      .then(() => { setPlayState(true); })
-      .catch(() => { setPlayState(false); }); // Autoplay blocked — user must tap
+      .then(() => setPlayState(true))
+      .catch(() => setPlayState(false));
   }
 }
 
 function setPlayState(playing) {
   isPlaying = playing;
-  iconPlay.style.display  = playing ? 'none'  : 'block';
-  iconPause.style.display = playing ? 'block' : 'none';
-  if (playing) {
-    musicWave.classList.add('playing');
-  } else {
-    musicWave.classList.remove('playing');
+  if (iconPlay)  iconPlay.style.display  = playing ? 'none'  : 'block';
+  if (iconPause) iconPause.style.display = playing ? 'block' : 'none';
+  if (musicWave) {
+    playing ? musicWave.classList.add('playing') : musicWave.classList.remove('playing');
   }
 }
 
-musicBtn.addEventListener('click', () => {
-  if (isPlaying) {
-    audio.pause();
-    setPlayState(false);
-  } else {
-    audio.play().then(() => setPlayState(true)).catch(() => {});
-  }
-});
+if (musicBtn) {
+  musicBtn.addEventListener('click', () => {
+    if (isPlaying) {
+      audio.pause();
+      setPlayState(false);
+    } else {
+      audio.play().then(() => setPlayState(true)).catch(() => {});
+    }
+  });
+}
 
-// Sync state if audio is paused externally (e.g. by OS)
-audio.addEventListener('pause', () => setPlayState(false));
-audio.addEventListener('play',  () => setPlayState(true));
+if (audio) {
+  audio.addEventListener('pause', () => setPlayState(false));
+  audio.addEventListener('play',  () => setPlayState(true));
+}
 
 /* ============================================================
    6. COUNTDOWN TIMER
    ============================================================ */
-const WEDDING_DATE = new Date('2026-06-07T08:00:00');  // ← Ganti tanggal di sini
+const WEDDING_DATE = new Date('2026-06-07T09:00:00');
 
-const daysEl    = document.getElementById('days');
-const hoursEl   = document.getElementById('hours');
-const minutesEl = document.getElementById('minutes');
-const secondsEl = document.getElementById('seconds');
+const daysEl        = document.getElementById('days');
+const hoursEl       = document.getElementById('hours');
+const minutesEl     = document.getElementById('minutes');
+const secondsEl     = document.getElementById('seconds');
 const countdownEl   = document.getElementById('countdown');
 const countdownDone = document.getElementById('countdownDone');
 
 function pad(n) { return String(n).padStart(2, '0'); }
 
 function tickFlip(el, newVal) {
+  if (!el) return;
   if (el.textContent !== newVal) {
     el.textContent = newVal;
     el.classList.add('tick');
@@ -194,24 +181,16 @@ function tickFlip(el, newVal) {
 }
 
 function updateCountdown() {
-  const now  = new Date();
-  const diff = WEDDING_DATE - now;
-
+  const diff = WEDDING_DATE - new Date();
   if (diff <= 0) {
-    countdownEl.classList.add('hidden');
-    countdownDone.classList.remove('hidden');
+    if (countdownEl)   countdownEl.classList.add('hidden');
+    if (countdownDone) countdownDone.classList.remove('hidden');
     return;
   }
-
-  const days    = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-  tickFlip(daysEl,    pad(days));
-  tickFlip(hoursEl,   pad(hours));
-  tickFlip(minutesEl, pad(minutes));
-  tickFlip(secondsEl, pad(seconds));
+  tickFlip(daysEl,    pad(Math.floor(diff / 86400000)));
+  tickFlip(hoursEl,   pad(Math.floor((diff % 86400000) / 3600000)));
+  tickFlip(minutesEl, pad(Math.floor((diff % 3600000) / 60000)));
+  tickFlip(secondsEl, pad(Math.floor((diff % 60000) / 1000)));
 }
 
 updateCountdown();
@@ -225,34 +204,40 @@ const observer = new IntersectionObserver(
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
-        // Unobserve after first trigger for performance
         observer.unobserve(entry.target);
       }
     });
   },
-  {
-    threshold: 0.12,
-    rootMargin: '0px 0px -40px 0px',
-  }
+  { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
 );
 
-// Observe all fade-in elements inside #main
 function initObserver() {
   document.querySelectorAll('#main .fade-in').forEach((el) => observer.observe(el));
 }
 
-// Run after cover is dismissed (main becomes visible)
-openBtn.addEventListener('click', () => {
-  setTimeout(initObserver, 1000);
-});
-
-// Also trigger immediately if somehow already visible (dev/refresh)
-if (!main.classList.contains('hidden')) {
+// Jika main sudah visible (misal refresh saat dev)
+if (main && !main.classList.contains('hidden')) {
   initObserver();
 }
 
 /* ============================================================
-   8. SMOOTH SCROLL (fallback for old browsers)
+   8. COUNTDOWN SECTION observer
+   ============================================================ */
+const countdownSection = document.querySelector('.countdown-section');
+if (countdownSection) {
+  const cdObs = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        countdownSection.classList.add('visible');
+        cdObs.unobserve(countdownSection);
+      }
+    });
+  }, { threshold: 0.15 });
+  cdObs.observe(countdownSection);
+}
+
+/* ============================================================
+   9. SMOOTH SCROLL
    ============================================================ */
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   anchor.addEventListener('click', function (e) {
@@ -265,46 +250,43 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
 });
 
 /* ============================================================
-   9. GALLERY — simple lightbox (click to enlarge)
+   10. GALLERY LIGHTBOX
    ============================================================ */
 (function initLightbox() {
   const items = document.querySelectorAll('.gallery-item');
   if (!items.length) return;
 
-  // Create overlay
   const overlay = document.createElement('div');
   overlay.style.cssText = `
-    position: fixed; inset: 0; z-index: 9999;
-    background: rgba(30,15,5,0.92);
-    display: flex; align-items: center; justify-content: center;
-    cursor: zoom-out; opacity: 0;
-    transition: opacity 0.35s ease;
-    padding: 1rem;
-    backdrop-filter: blur(8px);
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(30,15,5,0.92);
+    display:none;align-items:center;justify-content:center;
+    cursor:zoom-out;opacity:0;
+    transition:opacity 0.35s ease;
+    padding:1rem;
+    backdrop-filter:blur(8px);
   `;
 
   const lightImg = document.createElement('img');
   lightImg.style.cssText = `
-    max-width: 90vw; max-height: 88vh;
-    border-radius: 8px;
-    box-shadow: 0 20px 80px rgba(0,0,0,0.5);
-    object-fit: contain;
-    transform: scale(0.92);
-    transition: transform 0.35s ease;
-    pointer-events: none;
+    max-width:90vw;max-height:88vh;
+    border-radius:8px;
+    box-shadow:0 20px 80px rgba(0,0,0,0.5);
+    object-fit:contain;
+    transform:scale(0.92);
+    transition:transform 0.35s ease;
+    pointer-events:none;
   `;
 
   const closeHint = document.createElement('p');
   closeHint.textContent = 'Klik di mana saja untuk menutup';
   closeHint.style.cssText = `
-    position: fixed; bottom: 1.5rem; left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.45);
-    font-family: 'Jost', sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    pointer-events: none;
+    position:fixed;bottom:1.5rem;left:50%;
+    transform:translateX(-50%);
+    color:rgba(255,255,255,0.45);
+    font-family:'Jost',sans-serif;
+    font-size:0.72rem;letter-spacing:0.15em;
+    text-transform:uppercase;pointer-events:none;
   `;
 
   overlay.appendChild(lightImg);
@@ -312,8 +294,8 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   document.body.appendChild(overlay);
 
   function openLightbox(src, alt) {
-    lightImg.src  = src;
-    lightImg.alt  = alt;
+    lightImg.src = src;
+    lightImg.alt = alt;
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     void overlay.offsetHeight;
@@ -339,26 +321,5 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   });
 
   overlay.addEventListener('click', closeLightbox);
-
-  // Close with Escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeLightbox();
-  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
 })();
-
-/* ============================================================
-   10. COUNTDOWN SECTION visibility trigger  
-       (so numbers animate in correctly on first view)
-   ============================================================ */
-const countdownSection = document.querySelector('.countdown-section');
-if (countdownSection) {
-  const cdObserver = new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (e.isIntersecting) {
-        countdownSection.classList.add('visible');
-        cdObserver.unobserve(countdownSection);
-      }
-    });
-  }, { threshold: 0.15 });
-  cdObserver.observe(countdownSection);
-}
