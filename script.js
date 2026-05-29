@@ -243,7 +243,7 @@ function initObserver() {
 
 // Run after cover is dismissed (main becomes visible)
 openBtn.addEventListener('click', () => {
-  setTimeout(initObserver, 100);
+  setTimeout(initObserver, 1000);
 });
 
 // Also trigger immediately if somehow already visible (dev/refresh)
