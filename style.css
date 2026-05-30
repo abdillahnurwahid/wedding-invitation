@@ -514,119 +514,374 @@ section { padding: 5rem 1.5rem; }
 /* ============================================================
    HERO
    ============================================================ */
+/* ========================================
+   HERO
+======================================== */
+
 .hero {
   position: relative;
   text-align: center;
-  padding: 6rem 1.5rem 5rem;
+  padding: 7rem 1.5rem 6rem;
+  overflow: hidden;
+
   background:
-    radial-gradient(ellipse at 20% 0%, rgba(212,180,122,0.15) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 100%, rgba(201,132,138,0.12) 0%, transparent 60%),
-    var(--cream);
+    radial-gradient(
+      circle at top center,
+      rgba(212,180,122,.18) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(201,132,138,.15) 0%,
+      transparent 50%
+    ),
+    linear-gradient(
+      180deg,
+      #fcfaf7 0%,
+      #f7f1ea 100%
+    );
 }
 
-.hero-ornament {
-  width: 120px;
-  height: 2px;
-  background: linear-gradient(to right, transparent, var(--gold-light), transparent);
-  margin: 0 auto 2.5rem;
+/* Frame luar */
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgba(212,180,122,.18);
+  border-radius: 24px;
+  pointer-events: none;
 }
-.hero-ornament.bottom { margin: 2.5rem auto 0; }
+
+/* Glow halus */
+
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  top: -220px;
+  left: 50%;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(
+      rgba(212,180,122,.18),
+      transparent 70%
+    );
+  pointer-events: none;
+}
+
+/* ========================================
+   ORNAMENT
+======================================== */
+
+.hero-ornament {
+  width: 180px;
+  height: 1px;
+  margin: 0 auto 2rem;
+  position: relative;
+
+  background:
+    linear-gradient(
+      to right,
+      transparent,
+      var(--gold-light),
+      transparent
+    );
+}
+
+.hero-ornament::after {
+  content: "✦";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  background: #faf7f2;
+  padding: 0 12px;
+
+  color: var(--gold);
+  font-size: 16px;
+}
+
+.hero-ornament.bottom {
+  margin-top: 3rem;
+}
+
+/* ========================================
+   OPENING
+======================================== */
 
 .hero-pre {
   font-family: var(--font-serif);
-  font-size: 1rem;
   font-style: italic;
-  letter-spacing: 0.05em;
-  color: var(--brown-soft);
-  margin-bottom: 0.4rem;
-}
 
-.hero-script {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 5vw, 2.2rem);
-  color: var(--gold);
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.8;
+
+  color: var(--brown-soft);
+
+  margin-bottom: .15rem;
 }
 
 .hero-sub {
-  font-size: 0.88rem;
+  max-width: 560px;
+
+  margin: 1.2rem auto 3rem;
+
+  font-size: 1rem;
+  line-height: 1.9;
+
   color: var(--text-muted);
-  max-width: 420px;
-  margin: 0 auto 3rem;
-  line-height: 1.8;
 }
 
-.hero-names {
+/* ========================================
+   COUPLE
+======================================== */
+
+.couple-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 2rem;
+
   flex-wrap: wrap;
-  margin-bottom: 2.5rem;
+
+  margin-bottom: 3rem;
 }
 
-.hero-name-block { text-align: center; }
+.couple-card {
+  max-width: 280px;
+}
 
-.hero-script-name {
+.couple-photo-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1.25rem;
+}
+
+.couple-photo {
+  width: 220px;
+  height: 220px;
+
+  border-radius: 50%;
+  overflow: hidden;
+
+  border: 6px solid rgba(255,255,255,.9);
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,.08),
+    0 0 0 1px rgba(212,180,122,.18);
+}
+
+.couple-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.couple-name {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 7vw, 3.2rem);
+  font-size: clamp(2rem, 5vw, 3rem);
+
   color: var(--brown);
-  line-height: 1;
-  margin-bottom: 0.5rem;
+
+  margin-bottom: .8rem;
+
+  text-shadow:
+    0 3px 12px rgba(212,180,122,.15);
 }
 
-.hero-name-detail {
-  font-size: 0.8rem;
+.couple-parents {
   color: var(--text-muted);
-  line-height: 1.6;
+  line-height: 1.8;
+  font-size: .9rem;
 }
-.hero-name-detail strong { color: var(--brown-soft); font-weight: 500; }
 
-.hero-amp {
-  color: var(--gold);
-  flex-shrink: 0;
-  opacity: 0.85;
+.couple-parents strong {
+  color: var(--brown-soft);
 }
+
+.couple-ig {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  margin-top: 1rem;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.8);
+  color: var(--gold);
+
+  transition: .3s;
+
+  box-shadow:
+    0 5px 15px rgba(0,0,0,.05);
+}
+
+.couple-ig:hover {
+  transform: translateY(-3px);
+  background: var(--gold);
+  color: white;
+}
+
+/* ========================================
+   AMPERSAND
+======================================== */
+
+.couple-amp {
+  color: var(--gold);
+
+  opacity: .9;
+
+  transform: translateY(-10px);
+
+  filter:
+    drop-shadow(
+      0 4px 12px rgba(212,180,122,.25)
+    );
+}
+
+/* ========================================
+   DATE BADGE
+======================================== */
 
 .hero-date-badge {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  border: 1.5px solid var(--gold-light);
-  border-radius: var(--radius);
-  padding: 1rem 2.5rem;
-  margin-bottom: 2.5rem;
-  background: linear-gradient(135deg, rgba(245,234,213,0.6), rgba(255,255,255,0.3));
-  backdrop-filter: blur(4px);
-  gap: 2px;
+
+  gap: 4px;
+
+  padding: 1.25rem 3rem;
+  margin-bottom: 3rem;
+
+  border-radius: 20px;
+
+  border: 1px solid rgba(212,180,122,.25);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.75),
+      rgba(245,234,213,.65)
+    );
+
+  backdrop-filter: blur(8px);
+
+  box-shadow:
+    0 15px 35px rgba(0,0,0,.05),
+    0 5px 15px rgba(212,180,122,.12);
 }
 
-.hero-date-day   { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
-.hero-date-num   { font-family: var(--font-serif); font-size: 3.5rem; line-height: 1; color: var(--brown); font-weight: 300; }
-.hero-date-month { font-family: var(--font-serif); font-size: 1rem; color: var(--brown-soft); letter-spacing: 0.05em; }
+.hero-date-day {
+  font-size: .75rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.hero-date-num {
+  font-family: var(--font-serif);
+  font-size: 4rem;
+  line-height: 1;
+  font-weight: 300;
+  color: var(--brown);
+}
+
+.hero-date-month {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--brown-soft);
+}
+
+/* ========================================
+   QUOTE
+======================================== */
 
 .hero-quote {
-  max-width: 480px;
+  max-width: 560px;
+
   margin: 0 auto;
+
+  padding: 1.2rem 1.6rem;
+
+  text-align: left;
+
+  background: rgba(255,255,255,.45);
+
+  border-left: 3px solid var(--gold-light);
+
+  border-radius: 0 14px 14px 0;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.04);
+
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 1rem;
+
   color: var(--text-muted);
-  border-left: 2px solid var(--gold-light);
-  padding: 0.8rem 1.5rem;
-  text-align: left;
-  line-height: 1.8;
-  background: rgba(245,234,213,0.3);
-  border-radius: 0 8px 8px 0;
+
+  line-height: 1.9;
 }
 
 .hero-quote cite {
   display: block;
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
+
+  margin-top: .8rem;
+
+  font-size: .8rem;
   font-style: normal;
-  letter-spacing: 0.05em;
+
+  letter-spacing: .08em;
+
   color: var(--gold);
+}
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 768px) {
+
+  .hero {
+    padding: 5rem 1.25rem 4rem;
+  }
+
+  .hero::before {
+    inset: 10px;
+  }
+
+  .couple-wrap {
+    gap: 2.5rem;
+  }
+
+  .couple-photo {
+    width: 180px;
+    height: 180px;
+  }
+
+  .couple-amp {
+    width: 100%;
+    transform: none;
+  }
+
+  .hero-date-badge {
+    padding: 1rem 2rem;
+  }
+
+  .hero-date-num {
+    font-size: 3rem;
+  }
+
+  .hero-quote {
+    text-align: center;
+  }
 }
 
 /* ============================================================
